@@ -1,0 +1,925 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101010">
+<title>VINN STORE — Top Up Game</title>
+<style>
+:root{
+ --bg:#101010;--panel:#1b1b1b;--gold:#e8b94e;--gold2:#ffdc83;
+ --white:#fff;--muted:#aaa;--line:#343434;--green:#26b875;
+}
+body.light{
+ --bg:#f4f4f4;--panel:#fff;--white:#191919;--muted:#666;
+ --line:#ddd;--gold:#b77b12;--gold2:#e4a82e;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--white);font-family:Arial,sans-serif;transition:.2s}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.wrap{width:min(1120px,92%);margin:auto}
+header{background:#090909;border-bottom:1px solid #302817}
+.nav{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-weight:900;font-size:23px;letter-spacing:1px;color:#fff}
+.brand span{color:var(--gold)}
+.nav-actions{display:flex;gap:8px;align-items:center}
+.navtag{font-size:10px;color:var(--gold2);letter-spacing:1px}
+.small-btn{background:#292929;color:#fff;border:1px solid #554321;border-radius:8px;padding:9px 11px;font-size:11px}
+.hero{margin:24px auto;padding:35px 25px;border-radius:20px;background:linear-gradient(120deg,#19150c,#3a2b12,#17130c);border:1px solid #765b27}
+.eyebrow{font-size:10px;color:var(--gold2);letter-spacing:3px;font-weight:bold}
+.hero h1{font-size:clamp(29px,6vw,46px);line-height:1.1;margin:13px 0;color:#fff}
+.hero h1 span{color:#e8b94e}
+.hero p{color:#ccc;font-size:13px;line-height:1.7;max-width:520px}
+.cta{display:inline-block;background:var(--gold);color:#17120a;padding:12px 18px;border-radius:9px;text-decoration:none;font-size:12px;font-weight:900;margin-top:10px}
+.promo{margin:18px 0;background:linear-gradient(100deg,#38270b,#79551b);border:1px solid #9c742b;padding:15px;border-radius:12px;color:#fff;font-size:12px;line-height:1.6}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:28px 0 15px}
+.section-head h2{font-size:20px;margin:0}
+.section-head p{font-size:11px;color:var(--muted)}
+.controls{display:grid;grid-template-columns:1fr 145px;gap:9px;margin-bottom:15px}
+.search,.filter{width:100%;padding:13px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--white);outline:none}
+.search:focus,.filter:focus{border-color:var(--gold)}
+.games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.game{background:var(--panel);border:1px solid var(--line);border-radius:15px;overflow:hidden;min-width:0;transition:.2s;animation:appear .35s ease both}
+.game:hover{transform:translateY(-3px);border-color:#96712d}
+@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.art{width:100%;aspect-ratio:1.5;display:block;object-fit:cover;background:#242424}
+.game-body{padding:12px}
+.game h3{font-size:14px;margin:0 0 5px}
+.game p{font-size:10px;color:var(--muted);margin:0 0 12px}
+.game button,.primary{width:100%;border:0;border-radius:9px;padding:12px;background:var(--gold);color:#17120a;font-weight:900;font-size:12px}
+.game button:hover,.primary:hover{background:var(--gold2)}
+.tag{display:inline-block;font-size:9px;background:#403018;color:#ffdc83;padding:4px 7px;border-radius:5px;margin-bottom:8px}
+.empty{display:none;text-align:center;color:var(--muted);padding:30px}
+.trust{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:24px 0}
+.trust div{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 5px;text-align:center}
+.trust b{display:block;color:var(--gold);font-size:11px}
+.trust span{font-size:9px;color:var(--muted)}
+.how,.panel-box{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px;margin:24px 0}
+.how h3{margin:0 0 10px;color:var(--gold)}
+.how ol{padding-left:19px;color:var(--muted);font-size:12px;line-height:2}
+footer{background:#080808;border-top:1px solid #302817;text-align:center;padding:25px 12px;color:#aaa;font-size:11px;margin-top:30px}
+.modal,.notice{display:none;position:fixed;inset:0;background:#000c;z-index:10;padding:14px;overflow:auto}
+.modal.show{display:block}
+.dialog{background:#1b1b1b;color:#fff;border:1px solid #5a4724;border-radius:17px;width:min(480px,100%);margin:12px auto;padding:19px}
+.dialog-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
+.dialog-head h2{font-size:18px;margin:0;color:#e8b94e}
+.x{border:0;border-radius:8px;background:#333;color:white;padding:7px 12px;font-size:19px}
+.field{margin:13px 0}
+.field label{display:block;font-size:11px;font-weight:bold;margin-bottom:7px;color:#eee}
+.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid #444;border-radius:9px;background:#101010;color:white;font-size:13px}
+.field input:focus,.field select:focus{outline:1px solid #e8b94e}
+.price-note,.hint{font-size:10px;color:#aaa;line-height:1.5;margin-top:6px}
+.payment{background:#282216;border:1px solid #5a4724;border-radius:12px;padding:13px;text-align:center;margin-top:14px}
+.payment b{color:#e8b94e}
+.payment img{width:min(240px,100%);max-height:300px;object-fit:contain;display:block;margin:12px auto;background:white;border-radius:5px}
+.total{display:flex;justify-content:space-between;align-items:center;margin:14px 0;padding:13px;background:#292929;border-radius:9px;font-size:12px;color:#fff}
+.total strong{font-size:17px;color:#e8b94e}
+.primary{padding:14px;font-size:13px}
+.primary:disabled{opacity:.5;cursor:not-allowed}
+.notice{z-index:30;align-items:center;justify-content:center}
+.notice.show{display:flex}
+.notice-card{width:min(390px,100%);background:#1b1b1b;border:1px solid #80622b;border-radius:20px;padding:25px;text-align:center;color:#fff}
+.notice-icon{width:65px;height:65px;border-radius:50%;background:#173b2a;color:#4ee09a;display:grid;place-items:center;font-size:34px;margin:0 auto 15px}
+.notice-card h2{color:#e8b94e;font-size:20px}
+.notice-card p{font-size:12px;line-height:1.7;color:#ccc}
+.order-number{background:#292929;border:1px dashed #e8b94e;border-radius:9px;padding:12px;margin:15px 0;color:#e8b94e;font-weight:bold}
+.notice-card button{width:100%;padding:13px;background:#e8b94e;border:0;border-radius:9px;font-weight:bold}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11px;min-width:500px}
+td,th{padding:10px;border-bottom:1px solid #444;text-align:left;color:#eee}
+th{color:#e8b94e}
+.admin-actions{display:flex;gap:5px;flex-wrap:wrap}
+.admin-actions button{border:0;border-radius:6px;padding:7px;font-size:10px}
+.status{color:#ffdc83}
+.section-link{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}
+.section-link button{background:var(--panel);border:1px solid var(--line);color:var(--white);border-radius:8px;padding:10px;font-size:11px}
+.promo-admin{background:#282216;border:1px solid #5a4724;border-radius:12px;padding:14px;margin:16px 0}
+.promo-admin h3{color:#e8b94e;margin:0 0 12px;font-size:15px}
+.promo-form{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.promo-form .field{margin:5px 0}
+.promo-form .field.full{grid-column:1/-1}
+.promo-form input{width:100%;padding:11px;border:1px solid #554321;border-radius:8px;background:#101010;color:white}
+.promo-add{width:100%;border:0;border-radius:8px;background:#e8b94e;color:#17120a;padding:12px;font-weight:bold}
+.promo-admin-item{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid #554321;font-size:11px}
+.promo-admin-item:last-child{border-bottom:0}
+.promo-admin-item strong{color:#ffdc83}
+.promo-admin-actions{display:flex;gap:5px}
+.promo-admin-actions button{border:0;border-radius:6px;padding:7px 9px;font-size:10px}
+.promo-toggle{background:#73551d;color:#fff}
+.promo-delete{background:#9a3434;color:#fff}
+.promo-state{font-size:10px;color:#aaa;margin-top:4px}
+@media(min-width:650px){.games{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.game-body{padding:15px}.game h3{font-size:16px}.hero{padding:45px}}
+@media(min-width:950px){.games{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header>
+ <div class="wrap nav">
+  <div class="brand">VINN <span>STORE</span></div>
+  <div class="nav-actions">
+   <div class="navtag">FAST & TRUSTED</div>
+   <button class="small-btn" id="themeBtn" type="button">☀️</button>
+  </div>
+ </div>
+</header>
+
+<main class="wrap">
+ <section class="hero">
+  <div class="eyebrow">WELCOME TO VINN STORE</div>
+  <h1>TOP UP GAME<br><span>MUDAH & CEPAT.</span></h1>
+  <p>Temukan berbagai pilihan top up game favoritmu. Pilih produk, masukkan data akun, lakukan pembayaran QRIS, dan tunggu verifikasi admin.</p>
+  <a class="cta" href="#katalog">BELANJA SEKARANG ↓</a>
+ </section>
+
+ <div class="promo" id="promoBanner"></div>
+
+ <div class="section-head" id="katalog">
+  <h2>⭐ Best Seller</h2><p>Produk pilihan</p>
+ </div>
+ <section class="games" id="bestGames"></section>
+
+ <div class="section-head">
+  <h2>Katalog Game</h2><p id="gameCount">12 GAME</p>
+ </div>
+ <div class="controls">
+  <input class="search" id="searchGame" type="search" placeholder="Cari game favorit kamu...">
+  <select class="filter" id="categoryFilter">
+   <option value="all">Semua kategori</option>
+   <option value="MOBA">MOBA</option>
+   <option value="FPS">FPS / Shooter</option>
+   <option value="RPG">RPG</option>
+   <option value="Casual">Casual</option>
+  </select>
+ </div>
+ <section class="games" id="games"></section>
+ <div class="empty" id="empty">Game tidak ditemukan.</div>
+
+ <section class="trust">
+  <div><b>⚡ CEPAT</b><span>Proses praktis</span></div>
+  <div><b>🔒 AMAN</b><span>Tanpa password</span></div>
+  <div><b>💳 QRIS</b><span>Pembayaran mudah</span></div>
+ </section>
+
+ <section class="how">
+  <h3>Cara Pemesanan</h3>
+  <ol>
+   <li>Pilih game dan nominal top up.</li>
+   <li>Masukkan Player ID dan data yang diminta.</li>
+   <li>Scan QRIS sesuai total pesanan.</li>
+   <li>Unggah bukti pembayaran dan kirim pesanan.</li>
+   <li>Tunggu admin memeriksa pembayaran.</li>
+  </ol>
+ </section>
+
+ <section class="panel-box" id="trackingSection">
+  <h3 style="color:var(--gold);margin-top:0">🔎 Lacak Pesanan</h3>
+  <p style="font-size:11px;color:var(--muted)">Masukkan nomor pesanan untuk melihat status yang tersimpan di browser ini.</p>
+  <div class="controls">
+   <input class="search" id="trackInput" placeholder="Contoh: VINN-12345678">
+   <button class="primary" type="button" id="trackBtn">LACAK</button>
+  </div>
+  <div id="trackResult" style="font-size:12px"></div>
+ </section>
+
+ <section class="panel-box">
+  <h3 style="color:var(--gold);margin-top:0">📋 Riwayat Transaksi</h3>
+  <div id="historyList" style="font-size:12px;color:var(--muted)">Belum ada transaksi di perangkat ini.</div>
+ </section>
+</main>
+
+<footer>
+ © 2026 VINN STORE · Harga dapat berubah mengikuti pemasok dan promo.
+ <div class="section-link" style="justify-content:center">
+  <button type="button" id="adminOpen">ADMIN DASHBOARD</button>
+ </div>
+</footer>
+
+<div class="modal" id="modal" aria-hidden="true">
+ <div class="dialog">
+  <div class="dialog-head">
+   <h2>Form Pemesanan</h2>
+   <button class="x" type="button" id="closeOrder">×</button>
+  </div>
+  <form id="orderForm">
+   <div class="field"><label>Game</label><input id="gameName" readonly></div>
+   <div class="field"><label>Player ID / Username</label><input id="playerId" required maxlength="100" placeholder="Masukkan ID akun game"></div>
+   <div class="field" id="serverField"><label>Server / Zone ID</label><input id="server" maxlength="50" placeholder="Masukkan server / zone ID"></div>
+   <div class="field"><label>Gmail aktif</label><input id="email" type="email" required maxlength="150" placeholder="nama@gmail.com"></div>
+   <div class="field">
+    <label>Pilih nominal</label>
+    <select id="nominal" required><option value="">Pilih nominal</option></select>
+    <div class="price-note">Harga etalase merupakan estimasi. Pastikan harga sebelum membayar.</div>
+   </div>
+   <div class="field">
+    <label>Kode promo (opsional)</label>
+    <input id="coupon" placeholder="Masukkan kode promo">
+    <div class="price-note" id="couponInfo">Masukkan kode promo jika tersedia.</div>
+   </div>
+   <div class="payment">
+    <b>PEMBAYARAN QRIS SANZZ</b>
+    <img id="qrisImage" src="./QRIS-SANZZ.jpg" alt="QRIS SANZZ">
+    <small id="qrisMissing" style="display:none;color:#ff7777">QRIS tidak ditemukan. Letakkan QRIS-SANZZ.jpg satu folder dengan index.html.</small>
+    <br><small>Scan QRIS sesuai total pesanan.</small>
+   </div>
+   <div class="total"><span>Subtotal</span><strong id="subtotalPrice">Rp0</strong></div>
+   <div class="total"><span>Diskon</span><strong id="discountPrice">Rp0</strong></div>
+   <div class="total"><span>Total pembayaran</span><strong id="totalPrice">Rp0</strong></div>
+   <div class="field">
+    <label>Bukti pembayaran (gambar, maks. 8 MB)</label>
+    <input id="proof" type="file" accept="image/*" required>
+   </div>
+   <button class="primary" type="submit">KIRIM PESANAN</button>
+   <p class="hint">Jangan pernah memberikan password atau kode OTP akun game.</p>
+  </form>
+ </div>
+</div>
+
+<div class="notice" id="notice">
+ <div class="notice-card">
+  <div class="notice-icon">✓</div>
+  <h2>PESANAN DIBUAT</h2>
+  <p>Browser telah mencoba mengirim detail dan bukti pembayaran ke channel bukti pembayaran serta notifikasi konfirmasi ke admin. Periksa kedua channel Discord untuk memastikan pesan masuk.</p>
+  <div class="order-number" id="noticeOrderId">VINN-00000000</div>
+  <button type="button" id="closeNotice">MENGERTI</button>
+ </div>
+</div>
+
+<div class="modal" id="adminLogin">
+ <div class="dialog">
+  <div class="dialog-head"><h2>Login Admin</h2><button class="x" id="closeLogin">×</button></div>
+  <div class="field"><label>PIN Admin</label><input id="adminPin" type="password" placeholder="Masukkan PIN dashboard"></div>
+  <button class="primary" type="button" id="adminLoginBtn">MASUK DASHBOARD</button>
+  <p class="hint">Masukkan PIN untuk mengakses dashboard admin.</p>
+ </div>
+</div>
+
+<div class="modal" id="adminDashboard">
+ <div class="dialog" style="width:min(850px,100%)">
+  <div class="dialog-head"><h2>Dashboard Admin</h2><button class="x" id="closeAdmin">×</button></div>
+  <p class="hint">Data transaksi dan promo pada versi ini tersimpan di browser/perangkat ini.</p>
+
+  <div class="promo-admin">
+   <h3>🎟️ KELOLA KODE PROMO</h3>
+   <div class="promo-form">
+    <div class="field">
+     <label>Kode Promo</label>
+     <input id="newPromoCode" maxlength="20" placeholder="Contoh: HEMAT20">
+    </div>
+    <div class="field">
+     <label>Diskon (%)</label>
+     <input id="newPromoPercent" type="number" min="1" max="100" placeholder="Contoh: 20">
+    </div>
+    <div class="field full">
+     <label>Maksimal Potongan Harga (Rp)</label>
+     <input id="newPromoMax" type="number" min="0" placeholder="Contoh: 10000">
+     <div class="price-note">Isi 0 jika potongan tidak memiliki batas maksimal.</div>
+    </div>
+   </div>
+   <button class="promo-add" type="button" id="addPromo">+ BUAT KODE PROMO</button>
+   <div id="promoAdminList" style="margin-top:10px"></div>
+  </div>
+
+  <div class="section-link">
+   <button id="exportCsv">EKSPOR CSV</button>
+   <button id="clearHistory">HAPUS RIWAYAT LOKAL</button>
+  </div>
+  <div id="adminStats" style="font-size:12px;color:#eee;margin:12px 0"></div>
+  <div class="table-wrap">
+   <table>
+    <thead><tr><th>Pesanan</th><th>Detail</th><th>Total</th><th>Promo</th><th>Status</th><th>Ubah Status</th></tr></thead>
+    <tbody id="adminRows"></tbody>
+   </table>
+  </div>
+ </div>
+</div>
+
+<script>
+"use strict";
+
+/* WEBHOOK TERBARU */
+const DISCORD_WEBHOOK_URL='https://discord.com/api/webhooks/1572968412324438056/nc2aRR1nomWhh6m1qbcsSrnJiFW-pzdZ1krBwKUeNMCAuRuwHrEOMRuIdccPvYDdbXgP';
+const DISCORD_ORDER_WEBHOOK_URL='https://discord.com/api/webhooks/1572968484038639787/nkHSa0PQZUFWo8CG94c_dANT--EO5nRBJJuepa-Bzt0N_VffIfueehlmbdcb6_cVmWmN';
+
+const ADMIN_PIN='Vinn23';
+const STORAGE_KEY='vinn_store_orders_v3';
+const THEME_KEY='vinn_store_theme';
+const PROMO_KEY='vinn_store_promos_v1';
+
+const DEFAULT_PROMOS=[
+ {code:'VINN10',percent:10,max:10000,active:true}
+];
+
+const games=[
+ {name:'Mobile Legends',desc:'Diamond & Weekly Pass',category:'MOBA',colors:['#092c55','#168acb'],items:[
+  ['5 Diamond',2000],['12 Diamond',4500],['28 Diamond',9500],['50 Diamond',17000],['70 Diamond',23000],['Weekly Diamond Pass',28000],['150 Diamond',45000],['250 Diamond',75000]
+ ]},
+ {name:'PUBG Mobile',desc:'Unknown Cash (UC)',category:'FPS',colors:['#39220c','#c17b25'],items:[
+  ['60 UC',17000],['300 + 25 UC',82000],['600 + 60 UC',165000],['1500 + 300 UC',410000],['3000 + 850 UC',820000],['6000 + 2100 UC',1640000]
+ ]},
+ {name:'Free Fire',desc:'Diamond Free Fire',category:'FPS',colors:['#50120b','#e84d20'],items:[
+  ['5 Diamond',1000],['50 Diamond',7000],['70 Diamond',9000],['100 Diamond',13000],['140 Diamond',17000],['210 Diamond',27000],['355 Diamond',42000],['720 Diamond',85000],['1000 Diamond',120000]
+ ]},
+ {name:'Super Sus',desc:'Golden Star & Card',category:'Casual',colors:['#153c39','#26a88c'],items:[
+  ['100 Golden Star',12000],['310 Golden Star',35000],['520 Golden Star',60000],['1060 Golden Star',120000],['2180 Golden Star',245000],['5600 Golden Star',590000],['Weekly Card',13000],['Monthly Card',145000]
+ ]},
+ {name:'Roblox',desc:'Robux',category:'Casual',colors:['#292929','#777'],items:[
+  ['80 Robux',16000],['200 Robux',40000],['400 Robux',79000],['800 Robux',159000],['1700 Robux',319000],['4500 Robux',799000],['10000 Robux',1590000]
+ ]},
+ {name:'Genshin Impact',desc:'Genesis Crystal',category:'RPG',colors:['#25365a','#8baddd'],items:[
+  ['60 Genesis Crystal',16000],['Blessing of the Welkin Moon',60000],['300 + 30 Crystal',79000],['980 + 110 Crystal',239000],['1980 + 260 Crystal',479000],['3280 + 600 Crystal',799000],['6480 + 1600 Crystal',1599000]
+ ]},
+ {name:'Honkai: Star Rail',desc:'Oneiric Shard',category:'RPG',colors:['#38264e','#a47acb'],items:[
+  ['60 Oneiric Shard',16000],['Express Supply Pass',60000],['300 + 30 Shard',79000],['980 + 110 Shard',239000],['1980 + 260 Shard',479000],['3280 + 600 Shard',799000],['6480 + 1600 Shard',1599000]
+ ]},
+ {name:'Call of Duty Mobile',desc:'CP Points',category:'FPS',colors:['#26392b','#8da85d'],items:[
+  ['31 CP',5000],['62 CP',10000],['127 CP',19000],['320 CP',45000],['645 CP',90000],['800 CP',110000],['1600 CP',220000],['4000 CP',530000]
+ ]},
+ {name:'Valorant',desc:'Valorant Points',category:'FPS',colors:['#4b151b','#d44a56'],items:[
+  ['125 VP',16000],['420 VP',50000],['700 VP',80000],['1375 VP',150000],['2400 VP',250000],['4000 VP',410000],['8150 VP',820000]
+ ]},
+ {name:'Arena of Valor',desc:'Voucher AOV',category:'MOBA',colors:['#183d54','#36a3c5'],items:[
+  ['40 Voucher',10000],['90 Voucher',20000],['230 Voucher',50000],['470 Voucher',100000],['950 Voucher',200000],['1430 Voucher',300000],['2390 Voucher',500000]
+ ]},
+ {name:'Wild Rift',desc:'Wild Cores',category:'MOBA',colors:['#172b52','#4c8bd2'],items:[
+  ['125 Wild Cores',16000],['420 Wild Cores',50000],['700 Wild Cores',80000],['1375 Wild Cores',150000],['2400 Wild Cores',250000],['4000 Wild Cores',410000]
+ ]},
+ {name:'Point Blank',desc:'Cash Point Blank',category:'FPS',colors:['#333027','#b69a55'],items:[
+  ['1200 Cash',10000],['2400 Cash',20000],['6000 Cash',50000],['12000 Cash',100000],['24000 Cash',200000],['36000 Cash',300000],['60000 Cash',500000]
+ ]}
+];
+
+const $=id=>document.getElementById(id);
+const fmt=n=>'Rp'+Number(n||0).toLocaleString('id-ID');
+let selected=null;
+let currentDiscount=0;
+let currentPromoCode='';
+
+function escapeXML(s){
+ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
+}
+function safeText(v){
+ return String(v??'-').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function makeGameArt(game){
+ const name=escapeXML(game.name),c1=game.colors[0],c2=game.colors[1];
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="900" height="570" viewBox="0 0 900 570">
+ <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs>
+ <rect width="900" height="570" fill="url(#bg)"/><circle cx="700" cy="130" r="270" fill="#fff" opacity=".08"/>
+ <path d="M0 430L900 180V570H0Z" fill="#000" opacity=".18"/>
+ <rect x="45" y="40" width="240" height="52" rx="13" fill="#111" opacity=".7"/>
+ <text x="165" y="74" text-anchor="middle" font-family="Arial" font-size="25" font-weight="900" fill="#f3c65c">VINN STORE</text>
+ <g transform="translate(650 310)" opacity=".22" fill="none" stroke="#fff" stroke-width="18"><path d="M-155 -30Q-170 -95 -110 -100H110Q170 -95 155 -30L130 85Q115 125 75 95L25 55H-25L-75 95Q-115 125 -130 85Z"/><path d="M-95 -35V35M-130 0H-60M75 -25H77M110 10H112"/></g>
+ <text x="55" y="300" font-family="Arial" font-size="54" font-weight="900" fill="#fff">${name}</text>
+ <text x="58" y="355" font-family="Arial" font-size="25" font-weight="bold" letter-spacing="5" fill="#ffdf91">GAME TOP UP</text>
+ <rect x="58" y="390" width="270" height="5" rx="2" fill="#f2c45d"/>
+ <text x="58" y="445" font-family="Arial" font-size="19" fill="#fff">FAST • EASY • SECURE</text>
+ </svg>`;
+ return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
+}
+
+function renderCard(g,container,best=false){
+ const card=document.createElement('article');card.className='game';
+ const img=document.createElement('img');img.className='art';img.alt='Cover '+g.name;img.src=makeGameArt(g);
+ const body=document.createElement('div');body.className='game-body';
+ const tag=document.createElement('span');tag.className='tag';tag.textContent=best?'⭐ BEST SELLER':g.category;
+ const title=document.createElement('h3');title.textContent=g.name;
+ const desc=document.createElement('p');desc.textContent=g.desc;
+ const btn=document.createElement('button');btn.type='button';btn.textContent='PILIH NOMINAL';
+ btn.addEventListener('click',()=>openModal(g.name));
+ body.append(tag,title,desc,btn);card.append(img,body);container.appendChild(card);
+}
+
+function renderGames(){
+ const q=$('searchGame').value.toLowerCase().trim();
+ const cat=$('categoryFilter').value;
+ const list=games.filter(g=>(g.name.toLowerCase().includes(q)||g.desc.toLowerCase().includes(q))&&(cat==='all'||g.category===cat));
+ $('games').innerHTML='';
+ list.forEach(g=>renderCard(g,$('games')));
+ $('gameCount').textContent=list.length+' GAME';
+ $('empty').style.display=list.length?'none':'block';
+}
+
+games.slice(0,4).forEach(g=>renderCard(g,$('bestGames'),true));
+renderGames();
+$('searchGame').addEventListener('input',renderGames);
+$('categoryFilter').addEventListener('change',renderGames);
+
+/* PENYIMPANAN DATA */
+function getOrders(){
+ try{
+  const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+  return Array.isArray(data)?data:[];
+ }catch(e){return []}
+}
+function saveOrders(orders){
+ try{
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(orders));
+  return true;
+ }catch(e){
+  alert('Riwayat gagal disimpan. Penyimpanan browser mungkin penuh.');
+  return false;
+ }
+}
+
+function getPromos(){
+ const defaults=DEFAULT_PROMOS.map(p=>({...p}));
+ try{
+  const saved=localStorage.getItem(PROMO_KEY);
+  if(saved===null){
+   localStorage.setItem(PROMO_KEY,JSON.stringify(defaults));
+   return defaults;
+  }
+  const parsed=JSON.parse(saved);
+  if(!Array.isArray(parsed))return defaults;
+  return parsed.filter(p=>p&&typeof p==='object').map(p=>({
+   code:String(p.code||'').toUpperCase(),
+   percent:Number(p.percent),
+   max:Number(p.max),
+   active:p.active===true
+  })).filter(p=>
+   /^[A-Z0-9_-]{3,20}$/.test(p.code)&&
+   Number.isInteger(p.percent)&&p.percent>=1&&p.percent<=100&&
+   Number.isFinite(p.max)&&p.max>=0
+  );
+ }catch(e){
+  console.error('Gagal membaca promo:',e);
+  return defaults;
+ }
+}
+function savePromos(promos){
+ try{
+  localStorage.setItem(PROMO_KEY,JSON.stringify(promos));
+  return true;
+ }catch(e){
+  console.error(e);
+  alert('Promo gagal disimpan. Periksa penyimpanan browser.');
+  return false;
+ }
+}
+
+/* BANNER PROMO */
+function renderPromoBanner(){
+ const active=getPromos().filter(p=>p.active);
+ const banner=$('promoBanner');
+ if(!active.length){
+  banner.style.display='none';
+  return;
+ }
+ banner.style.display='block';
+ banner.innerHTML='<b>🔥 PROMO VINN STORE</b><br>'+
+  active.map(p=>
+   'Gunakan kode <b>'+safeText(p.code)+'</b> untuk diskon <b>'+
+   p.percent+'%</b>'+
+   (p.max>0?' maksimal '+fmt(p.max):' tanpa batas maksimal')+'.'
+  ).join('<br>');
+}
+
+/* DASHBOARD PROMO */
+function renderPromoAdmin(){
+ const promos=getPromos();
+ const list=$('promoAdminList');
+ if(!promos.length){
+  list.innerHTML='<p class="hint">Belum ada kode promo. Buat kode promo baru di atas.</p>';
+  return;
+ }
+ list.innerHTML=promos.map((p,index)=>`
+  <div class="promo-admin-item">
+   <div>
+    <strong>${safeText(p.code)}</strong>
+    <div class="promo-state">
+     Diskon ${p.percent}% · Maksimal:
+     ${p.max>0?fmt(p.max):'Tanpa batas'}
+     · ${p.active?'AKTIF':'NONAKTIF'}
+    </div>
+   </div>
+   <div class="promo-admin-actions">
+    <button type="button" class="promo-toggle" data-action="toggle" data-index="${index}">
+     ${p.active?'NONAKTIFKAN':'AKTIFKAN'}
+    </button>
+    <button type="button" class="promo-delete" data-action="delete" data-index="${index}">HAPUS</button>
+   </div>
+  </div>
+ `).join('');
+}
+
+$('addPromo').addEventListener('click',()=>{
+ const code=$('newPromoCode').value.trim().toUpperCase();
+ const percent=Number($('newPromoPercent').value);
+ const max=Number($('newPromoMax').value);
+
+ if(!/^[A-Z0-9_-]{3,20}$/.test(code)){
+  alert('Kode promo harus 3-20 karakter, hanya huruf, angka, tanda - atau _.');
+  return;
+ }
+ if(!Number.isInteger(percent)||percent<1||percent>100){
+  alert('Persentase diskon harus antara 1 sampai 100.');
+  return;
+ }
+ if($('newPromoMax').value.trim()===''||!Number.isSafeInteger(max)||max<0){
+  alert('Isi maksimal potongan dengan angka 0 atau lebih.');
+  return;
+ }
+
+ const promos=getPromos();
+ if(promos.some(p=>p.code===code)){
+  alert('Kode promo sudah ada.');
+  return;
+ }
+ promos.push({code,percent,max,active:true});
+ if(!savePromos(promos))return;
+
+ $('newPromoCode').value='';
+ $('newPromoPercent').value='';
+ $('newPromoMax').value='';
+ renderPromoAdmin();
+ renderPromoBanner();
+ calculate();
+ alert('Kode promo '+code+' berhasil dibuat dan aktif.');
+});
+
+$('promoAdminList').addEventListener('click',e=>{
+ const button=e.target.closest('button[data-action]');
+ if(!button)return;
+ const index=Number(button.dataset.index);
+ const promos=getPromos();
+ if(!Number.isInteger(index)||!promos[index])return;
+
+ if(button.dataset.action==='toggle'){
+  promos[index].active=!promos[index].active;
+ }else if(button.dataset.action==='delete'){
+  if(!confirm('Yakin ingin menghapus kode '+promos[index].code+'?'))return;
+  promos.splice(index,1);
+ }else return;
+
+ if(!savePromos(promos))return;
+ renderPromoAdmin();
+ renderPromoBanner();
+ calculate();
+});
+
+/* FORM PEMESANAN */
+function openModal(gameName){
+ selected=games.find(g=>g.name===gameName);
+ if(!selected)return;
+
+ $('orderForm').reset();
+ $('gameName').value=selected.name;
+
+ const select=$('nominal');
+ select.innerHTML='<option value="">Pilih nominal</option>';
+ selected.items.forEach(([name,price])=>{
+  const op=document.createElement('option');
+  op.value=String(price);
+  op.dataset.product=name;
+  op.textContent=name+' — '+fmt(price);
+  select.appendChild(op);
+ });
+
+ currentDiscount=0;
+ currentPromoCode='';
+ $('couponInfo').textContent='Masukkan kode promo jika tersedia.';
+ $('couponInfo').style.color='#aaa';
+ $('totalPrice').textContent='Rp0';
+ $('subtotalPrice').textContent='Rp0';
+ $('discountPrice').textContent='Rp0';
+
+ const needServer=['Mobile Legends','PUBG Mobile','Call of Duty Mobile'].includes(selected.name);
+ $('serverField').style.display=needServer?'block':'none';
+ $('server').required=needServer;
+
+ $('modal').classList.add('show');
+ $('modal').setAttribute('aria-hidden','false');
+}
+function closeModal(){
+ $('modal').classList.remove('show');
+ $('modal').setAttribute('aria-hidden','true');
+}
+function closeNotice(){$('notice').classList.remove('show')}
+function closeAdminLogin(){$('adminLogin').classList.remove('show')}
+function closeAdmin(){$('adminDashboard').classList.remove('show')}
+
+$('closeOrder').addEventListener('click',closeModal);
+$('closeNotice').addEventListener('click',closeNotice);
+$('closeLogin').addEventListener('click',closeAdminLogin);
+$('closeAdmin').addEventListener('click',closeAdmin);
+
+$('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+$('adminLogin').addEventListener('click',e=>{if(e.target.id==='adminLogin')closeAdminLogin()});
+$('adminDashboard').addEventListener('click',e=>{if(e.target.id==='adminDashboard')closeAdmin()});
+
+$('qrisImage').addEventListener('error',()=>{
+ $('qrisImage').style.display='none';
+ $('qrisMissing').style.display='block';
+});
+
+/* HITUNG DISKON */
+function calculate(){
+ const price=Number($('nominal').value||0);
+ const code=$('coupon').value.trim().toUpperCase();
+ const promo=getPromos().find(p=>p.code===code&&p.active===true);
+ let discount=0;
+ currentPromoCode='';
+
+ if(price>0&&code&&promo){
+  discount=Math.round(price*promo.percent/100);
+  if(promo.max>0)discount=Math.min(discount,promo.max);
+  discount=Math.min(discount,price);
+  currentPromoCode=promo.code;
+  $('couponInfo').textContent='Kode '+promo.code+' berhasil digunakan. Diskon '+promo.percent+'%.';
+  $('couponInfo').style.color='#26b875';
+ }else if(code){
+  $('couponInfo').textContent='Kode promo tidak valid atau sedang tidak aktif.';
+  $('couponInfo').style.color='#ff7777';
+ }else{
+  $('couponInfo').textContent='Masukkan kode promo jika tersedia.';
+  $('couponInfo').style.color='#aaa';
+ }
+
+ currentDiscount=discount;
+ $('subtotalPrice').textContent=fmt(price);
+ $('discountPrice').textContent=fmt(discount);
+ $('totalPrice').textContent=fmt(Math.max(0,price-discount));
+}
+$('nominal').addEventListener('change',calculate);
+$('coupon').addEventListener('input',calculate);
+
+/* KIRIM PESANAN */
+$('orderForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+
+ const form=e.currentTarget;
+ const submit=form.querySelector('button[type="submit"]');
+ const proof=$('proof').files[0];
+ const price=Number($('nominal').value);
+
+ if(!selected){alert('Pilih game terlebih dahulu.');return}
+ if(!price){alert('Pilih nominal terlebih dahulu.');return}
+ if(!proof){alert('Pilih bukti pembayaran.');return}
+ if(!proof.type.startsWith('image/')){alert('Bukti pembayaran harus berupa gambar.');return}
+ if(proof.size>8*1024*1024){alert('Ukuran bukti maksimal 8 MB.');return}
+
+ calculate();
+
+ const orderId='VINN-'+Date.now().toString().slice(-8);
+ const product=$('nominal').selectedOptions[0].dataset.product;
+ const subtotal=price;
+ const discount=currentDiscount;
+ const total=Math.max(0,subtotal-discount);
+
+ const order={
+  id:orderId,
+  date:new Date().toISOString(),
+  game:selected.name,
+  product,
+  player:$('playerId').value.trim(),
+  server:$('server').value.trim()||'-',
+  email:$('email').value.trim(),
+  subtotal,
+  coupon:currentPromoCode||'-',
+  discount,
+  total,
+  status:'Menunggu verifikasi'
+ };
+
+ const extension=(proof.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+ const safeFilename='bukti-pembayaran.'+extension;
+
+ /* WEBHOOK 1: DETAIL PESANAN DAN FOTO */
+ const payload={
+  username:'VINN STORE ORDERS',
+  attachments:[{id:0,filename:safeFilename}],
+  embeds:[{
+   title:'🧾 DETAIL PESANAN + BUKTI PEMBAYARAN',
+   color:15105596,
+   fields:[
+    {name:'ID Pesanan',value:order.id,inline:true},
+    {name:'Game',value:order.game,inline:true},
+    {name:'Nominal',value:order.product,inline:true},
+    {name:'Player ID / Username',value:order.player,inline:true},
+    {name:'Server / Zone ID',value:order.server,inline:true},
+    {name:'Gmail',value:order.email,inline:false},
+    {name:'Kode Promo',value:order.coupon,inline:true},
+    {name:'Subtotal',value:fmt(subtotal),inline:true},
+    {name:'Diskon',value:fmt(discount),inline:true},
+    {name:'Total Pembayaran',value:fmt(total),inline:true},
+    {name:'Status',value:'Menunggu verifikasi admin',inline:false}
+   ],
+   image:{url:'attachment://'+safeFilename},
+   footer:{text:'VINN STORE • Bukti Pembayaran'},
+   timestamp:new Date().toISOString()
+  }]
+ };
+
+ const uploadBody=new FormData();
+ uploadBody.append('payload_json',JSON.stringify(payload));
+ uploadBody.append('files[0]',proof,safeFilename);
+
+ /* WEBHOOK 2: NOTIFIKASI ADMIN SAJA, TANPA FOTO */
+ const adminPayload={
+  username:'VINN STORE ADMIN',
+  embeds:[{
+   title:'🔔 PESANAN BARU MENUNGGU KONFIRMASI',
+   description:'Ada pesanan baru yang perlu diperiksa.\n\nSilakan buka channel bukti pembayaran untuk melihat detail transaksi dan foto bukti pembayaran.',
+   color:15105596,
+   fields:[
+    {name:'ID Pesanan',value:order.id,inline:true},
+    {name:'Game',value:order.game,inline:true},
+    {name:'Produk',value:order.product,inline:true},
+    {name:'Player ID',value:order.player,inline:true},
+    {name:'Server / Zone ID',value:order.server,inline:true},
+    {name:'Tindakan Admin',value:'Periksa bukti pembayaran lalu konfirmasi pesanan.',inline:false}
+   ],
+   footer:{text:'VINN STORE • Notifikasi Admin'},
+   timestamp:new Date().toISOString()
+  }]
+ };
+
+ const notificationBody=new FormData();
+ notificationBody.append('payload_json',JSON.stringify(adminPayload));
+
+ submit.disabled=true;
+ submit.textContent='MENGIRIM...';
+
+ try{
+  const orders=getOrders();
+  orders.unshift(order);
+  if(!saveOrders(orders))throw new Error('Gagal menyimpan pesanan lokal.');
+
+  const results=await Promise.allSettled([
+   fetch(DISCORD_WEBHOOK_URL,{
+    method:'POST',
+    mode:'no-cors',
+    body:uploadBody
+   }),
+   fetch(DISCORD_ORDER_WEBHOOK_URL,{
+    method:'POST',
+    mode:'no-cors',
+    body:notificationBody
+   })
+  ]);
+
+  results.forEach((result,index)=>{
+   if(result.status==='rejected'){
+    console.error(index===0?'Webhook 1 gagal dikirim:':'Webhook 2 gagal dikirim:',result.reason);
+   }
+  });
+
+  $('noticeOrderId').textContent=orderId;
+  form.reset();
+  selected=null;
+  currentDiscount=0;
+  currentPromoCode='';
+  $('totalPrice').textContent='Rp0';
+  $('subtotalPrice').textContent='Rp0';
+  $('discountPrice').textContent='Rp0';
+
+  closeModal();
+  $('notice').classList.add('show');
+  renderHistory();
+
+ }catch(err){
+  console.error(err);
+  alert('Terjadi kesalahan saat memproses pesanan. Periksa koneksi internet dan coba lagi.');
+ }finally{
+  submit.disabled=false;
+  submit.textContent='KIRIM PESANAN';
+ }
+});
+
+/* RIWAYAT */
+function renderHistory(){
+ const orders=getOrders();
+ if(!orders.length){
+  $('historyList').textContent='Belum ada transaksi di perangkat ini.';
+  return;
+ }
+ $('historyList').innerHTML=orders.slice(0,10).map(o=>
+  `<div style="padding:10px 0;border-bottom:1px solid var(--line)">
+   <b>${safeText(o.id)}</b> — ${safeText(o.game)}<br>
+   ${safeText(o.product)} · ${fmt(o.total)}<br>
+   Promo: ${safeText(o.coupon||'-')}<br>
+   <span style="color:var(--gold)">${safeText(o.status)}</span>
+  </div>`
+ ).join('');
+}
+renderHistory();
+
+/* LACAK PESANAN */
+$('trackBtn').addEventListener('click',()=>{
+ const id=$('trackInput').value.trim().toUpperCase();
+ const order=getOrders().find(o=>String(o.id).toUpperCase()===id);
+ if(!order){
+  $('trackResult').textContent='Pesanan tidak ditemukan di riwayat browser ini.';
+  return;
+ }
+ $('trackResult').innerHTML=
+  `<b>${safeText(order.id)}</b><br>${safeText(order.game)} — ${safeText(order.product)}<br>Total: ${fmt(order.total)}<br>Status: <b style="color:var(--gold)">${safeText(order.status)}</b>`;
+});
+
+/* TEMA */
+$('themeBtn').addEventListener('click',()=>{
+ document.body.classList.toggle('light');
+ const light=document.body.classList.contains('light');
+ localStorage.setItem(THEME_KEY,light?'light':'dark');
+ $('themeBtn').textContent=light?'🌙':'☀️';
+});
+if(localStorage.getItem(THEME_KEY)==='light'){
+ document.body.classList.add('light');
+ $('themeBtn').textContent='🌙';
+}
+
+/* ADMIN */
+$('adminOpen').addEventListener('click',()=>{
+ $('adminPin').value='';
+ $('adminLogin').classList.add('show');
+});
+$('adminLoginBtn').addEventListener('click',()=>{
+ if($('adminPin').value===ADMIN_PIN){
+  closeAdminLogin();
+  renderAdmin();
+  $('adminDashboard').classList.add('show');
+ }else{
+  alert('PIN admin salah.');
+ }
+});
+$('adminPin').addEventListener('keydown',e=>{
+ if(e.key==='Enter')$('adminLoginBtn').click();
+});
+
+function renderAdmin(){
+ const orders=getOrders();
+ const total=orders.reduce((s,o)=>s+Number(o.total||0),0);
+ $('adminStats').textContent='Total transaksi: '+orders.length+' | Total nilai pesanan: '+fmt(total);
+
+ const rows=$('adminRows');
+ rows.innerHTML='';
+
+ if(!orders.length){
+  rows.innerHTML='<tr><td colspan="6">Belum ada transaksi.</td></tr>';
+ }else{
+  orders.forEach(o=>{
+   const tr=document.createElement('tr');
+   tr.innerHTML=`<td>${safeText(o.id)}<br><small>${new Date(o.date).toLocaleString('id-ID')}</small></td>
+    <td>${safeText(o.game)}<br>${safeText(o.product)}<br>${safeText(o.player)}</td>
+    <td>${fmt(o.total)}</td>
+    <td>${safeText(o.coupon||'-')}</td>
+    <td class="status">${safeText(o.status)}</td>
+    <td><div class="admin-actions">
+    <button data-id="${safeText(o.id)}" data-status="Diproses" style="background:#e0a52c">Proses</button>
+    <button data-id="${safeText(o.id)}" data-status="Selesai" style="background:#26b875">Selesai</button>
+    <button data-id="${safeText(o.id)}" data-status="Ditolak" style="background:#c94b4b;color:white">Tolak</button>
+    </div></td>`;
+   rows.appendChild(tr);
+  });
+ }
+ renderPromoAdmin();
+}
+
+$('adminRows').addEventListener('click',e=>{
+ const btn=e.target.closest('button[data-id]');
+ if(!btn)return;
+ const orders=getOrders();
+ const order=orders.find(o=>o.id===btn.dataset.id);
+ if(!order)return;
+ order.status=btn.dataset.status;
+ if(!saveOrders(orders))return;
+ renderAdmin();
+ renderHistory();
+});
+
+/* EKSPOR CSV */
+$('exportCsv').addEventListener('click',()=>{
+ const orders=getOrders();
+ if(!orders.length){alert('Belum ada transaksi.');return}
+ const headers=['ID','Tanggal','Game','Produk','Player','Server','Email','Kode Promo','Subtotal','Diskon','Total','Status'];
+ const rows=orders.map(o=>[o.id,o.date,o.game,o.product,o.player,o.server,o.email,o.coupon,o.subtotal,o.discount,o.total,o.status]);
+ const csv=[headers,...rows].map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+ const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');
+ a.href=url;
+ a.download='vinn-store-transaksi.csv';
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+ URL.revokeObjectURL(url);
+});
+
+$('clearHistory').addEventListener('click',()=>{
+ if(confirm('Hapus seluruh riwayat transaksi lokal di browser ini?')){
+  localStorage.removeItem(STORAGE_KEY);
+  renderAdmin();
+  renderHistory();
+ }
+});
+
+/* INISIALISASI */
+getPromos();
+renderPromoBanner();
+</script>
+</body>
+</html>
